@@ -6,7 +6,7 @@ import {
   classify,
   dasherize,
   decamelize,
-  underscore
+  underscore,
 } from '@ember/string';
 
 const transformFunctions = {
@@ -15,7 +15,7 @@ const transformFunctions = {
   classify,
   dasherize,
   decamelize,
-  underscore
+  underscore,
 };
 
 function transformObject(object, operation) {
@@ -33,9 +33,12 @@ function transformObject(object, operation) {
   }
 }
 
-export default function(payload, operation) {
+export default function (payload, operation) {
   if (operation) {
-    assert("This normalize method of custom action's payload does not exist. Check Ember.String documentation!", !!transformFunctions[operation]);
+    assert(
+      "This normalize method of custom action's payload does not exist. Check Ember.String documentation!",
+      !!transformFunctions[operation]
+    );
     return transformObject(payload, operation);
   } else {
     return payload;

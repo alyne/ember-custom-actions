@@ -1,16 +1,19 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
+import { action } from '@ember/object';
 import { next } from '@ember/runloop';
 
-export default Component.extend({
-  tagName: 'a',
-  offset: -65,
+export default class ScrollToComponent extends Component {
+  get offset() {
+    return this.args.offset ?? -65;
+  }
 
-  click() {
+  @action
+  onClick() {
     next(() => {
-      let element = document.querySelector(this.get('href'));
-      let position = element.offsetTop + this.get('offset');
+      const element = document.querySelector(this.args.href);
+      const position = element.offsetTop + this.offset;
 
       window.scroll({ top: position, behavior: 'smooth' });
     });
   }
-});
+}

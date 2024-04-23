@@ -20,6 +20,7 @@ Ember Custom Actions is a package for defining custom API actions, dedicated for
 # Getting started
 
 ## Demo
+
 Before you will start with documentation check our demo app: [Ember-Custom-Actions Website](https://exelord.github.io/ember-custom-actions)
 
 ## Installation
@@ -29,167 +30,187 @@ Before you will start with documentation check our demo app: [Ember-Custom-Actio
 ## Documentation
 
 ### Model actions
+
 To define custom action like: `posts/1/publish` you can use
 `modelAction(path, options)` method with arguments:
+
 - `path` - url of the action scoped to our api (in our case it's `publish`)
 - `options` - optional parameter which will overwrite the configuration options
 
 ```js
-import Model from 'ember-data/model';
-import { modelAction } from 'ember-custom-actions';
+import Model from "@ember-data/model";
+import { modelAction } from "ember-custom-actions";
 
-export default Model.extend({
-  publish: modelAction('publish', { pushToStore: false }),
-});
-
+export default class PostModel extends Model {
+  publish = modelAction("publish", { pushToStore: false });
+}
 ```
 
 #### Usage
-```js
-let user = this.get('currentUser');
-let postToPublish = this.get('store').findRecord('post', 1);
-let payload = { publisher: user };
 
-postToPublish.publish(payload, /*{ custom options }*/).then((status) => {
-  alert(`Post has been: ${status}`)
-}).catch((error) => {
-  console.log('Here are your serialized model errors', error.serializedErrors);
-});
+```js
+const user = this.currentUser;
+const postToPublish = this.store.findRecord("post", 1);
+const payload = { publisher: user };
+
+postToPublish
+  .publish(payload /*{ custom options }*/)
+  .then((status) => {
+    alert(`Post has been: ${status}`);
+  })
+  .catch((error) => {
+    console.log(
+      "Here are your serialized model errors",
+      error.serializedErrors
+    );
+  });
 ```
 
 ### Resource actions
+
 To a define custom action like: `posts/favorites` you can use
 `resourceAction(actionId/path, options)` method with arguments:
+
 - `path` - url of the action scoped to our api (in our case it's `favorites`)
 - `options` - optional parameter which will overwrite the configuration options
 
 ```js
-import Model from 'ember-data/model';
-import { resourceAction } from 'ember-custom-actions';
+import Model from "@ember-data/model";
+import { resourceAction } from "ember-custom-actions";
 
-export default Model.extend({
-  favorites: resourceAction('favorites', { method: 'GET' }),
-});
-
+export default class PostModel extends Model {
+  favorites = resourceAction("favorites", { method: "GET" });
+}
 ```
 
 #### Usage
-```js
-let user = this.get('currentUser');
-let emptyPost = this.get('store').createRecord('post');
-let payload = { user };
 
-emptyPost.favorites(payload, /*{ custom options }*/).then((favoritesPosts) => {
-  console.log(favoritesPosts);
-}).finally(()=>{
-  emptyPost.deleteRecord();
-});
+```js
+const user = this.currentUser;
+const emptyPost = this.store.createRecord("post");
+const payload = { user };
+
+emptyPost
+  .favorites(payload /*{ custom options }*/)
+  .then((favoritesPosts) => {
+    console.log(favoritesPosts);
+  })
+  .finally(() => {
+    emptyPost.deleteRecord();
+  });
 ```
 
 ### Custom actions
+
 To define `customAction` and customize it by using ember-data flow, adapters and serializer you can use `customAction(actionId, options)` method with arguments:
+
 - `actionId` - id of the action which can be handled later on in adpaters and serializers
 - `options` - optional parameter which will overwrite the configuration options
 
 If you want to customize your request in your adapter please, implement our adapter mixin:
-```js
-import JSONAPIAdapter from 'ember-data/adapters/json-api';
-import { AdapterMixin } from 'ember-custom-actions';
 
-export default JSONAPIAdapter.extend(AdapterMixin);
+```js
+import JSONAPIAdapter from "@ember-data/adapter/json-api";
+import { AdapterMixin } from "ember-custom-actions";
+
+export default class PostAdapter extends JSONAPIAdapter.extend(AdapterMixin) {}
 ```
 
 Now you can customize following methods in the adpater:
-* [urlForCustomAction](#urlForCustomAction)
-* [dataForCustomAction](#dataForCustomAction)
-* [methodForCustomAction](#methodForCustomAction)
-* [headersForCustomAction](#headersForCustomAction)
 
+- [urlForCustomAction](#urlForCustomAction)
+- [dataForCustomAction](#dataForCustomAction)
+- [methodForCustomAction](#methodForCustomAction)
+- [headersForCustomAction](#headersForCustomAction)
 
 #### urlForCustomAction
+
 You can define your custom path for every `customAction` by adding a conditional:
 
 ```js
-export default JSONAPIAdapter.extend(AdapterMixin, {
+export default class PostAdapter extends JSONAPIAdapter.extend(AdapterMixin) {
   urlForCustomAction(modelName, id, snapshot, actionId, queryParams) {
-    if (actionId === 'myPublishAction') {
-      return 'https://my-custom-api.com/publish'
+    if (actionId === "myPublishAction") {
+      return "https://my-custom-api.com/publish";
     }
 
-    return this._super(...arguments);
+    return super.urlForCustomAction(...arguments);
   }
-});
+}
 ```
 
 If you would like to build custom `modelAction` you can do it by:
 
 ```js
-import { AdapterMixin } from 'ember-custom-actions';
+import { AdapterMixin } from "ember-custom-actions";
 
-export default JSONAPIAdapter.extend(AdapterMixin, {
+export default class PostAdapter extends JSONAPIAdapter.extend(AdapterMixin) {
   urlForCustomAction(modelName, id, snapshot, actionId, queryParams) {
-    if (requestType === 'myPublishAction') {
+    if (requestType === "myPublishAction") {
       return `${this._buildURL(modelName, id)}/publish`;
     }
 
-    return this._super(...arguments);
+    return super.urlForCustomAction(...arguments);
   }
-});
+}
 ```
 
 #### methodForCustomAction
+
 You can define your custom method for every `customAction` by adding a conditional:
 
 ```js
-import { AdapterMixin } from 'ember-custom-actions';
+import { AdapterMixin } from "ember-custom-actions";
 
-export default JSONAPIAdapter.extend(AdapterMixin, {
+export default class PostAdapter extends JSONAPIAdapter.extend(AdapterMixin) {
   methodForCustomAction(params) {
-    if (params.actionId === 'myPublishAction') {
-      return 'PUT';
+    if (params.actionId === "myPublishAction") {
+      return "PUT";
     }
 
-    return this._super(...arguments);
+    return super.methodForCustomAction(...arguments);
   }
-});
+}
 ```
 
 #### headersForCustomAction
+
 You can define your custom headers for every `customAction` by adding a conditional:
 
 ```js
-import { AdapterMixin } from 'ember-custom-actions';
+import { AdapterMixin } from "ember-custom-actions";
 
-export default JSONAPIAdapter.extend(AdapterMixin, {
+export default class PostAdapter extends JSONAPIAdapter.extend(AdapterMixin) {
   headersForCustomAction(params) {
-    if (params.actionId === 'myPublishAction') {
+    if (params.actionId === "myPublishAction") {
       return {
-        'Authorization-For-Custom-Action': 'mySuperToken123'
+        "Authorization-For-Custom-Action": "mySuperToken123",
       };
     }
 
-    return this._super(...arguments);
+    return super.headersForCustomAction(...arguments);
   }
-});
+}
 ```
 
 #### dataForCustomAction
+
 You can define your custom data for every `customAction` by adding a conditional:
 
 ```js
-import { AdapterMixin } from 'ember-custom-actions';
+import { AdapterMixin } from "ember-custom-actions";
 
-export default JSONAPIAdapter.extend(AdapterMixin, {
+export default class PostAdapter extends JSONAPIAdapter.extend(AdapterMixin) {
   dataForCustomAction(params) {
-    if (params.actionId === 'myPublishAction') {
+    if (params.actionId === "myPublishAction") {
       return {
-        myParam: 'send it to the server'
+        myParam: "send it to the server",
       };
     }
 
-    return this._super(...arguments);
+    return super.dataForCustomAction(...arguments);
   }
-});
+}
 ```
 
 `params` contains following data: `data`, `actionId`, `modelId`, `model`
@@ -198,11 +219,11 @@ export default JSONAPIAdapter.extend(AdapterMixin, {
 
 You can define your custom options in your `config/environment.js` file
 
-``` js
-module.exports = function(environment) {
-  var ENV = {
-    'emberCustomActions': {
-      method: 'POST',
+```js
+module.exports = function (environment) {
+  const ENV = {
+    emberCustomActions: {
+      method: "POST",
       data: {},
       headers: {},
       queryParams: {},
@@ -210,18 +231,22 @@ module.exports = function(environment) {
       adapterOptions: {},
       pushToStore: false,
       responseType: null,
-      normalizeOperation: ''
+      normalizeOperation: "",
     },
   };
 
   return ENV;
-}
+};
 ```
+
 #### `method`
+
 Default method of the request (GET, PUT, POST, DELETE, etc..)
 
 #### `headers`
+
 An object `{}` of custom headers. Eg:
+
 ```js
 {
   'my-custom-auth': 'mySuperToken123'
@@ -229,17 +254,20 @@ An object `{}` of custom headers. Eg:
 ```
 
 #### `ajaxOptions`
+
 Your own ajax options.
 ** USE ONLY IF YOU KNOW WHAT YOU ARE DOING! **
 Those properties will be overwritten by ECU.
 
 #### `pushToStore`
+
 If you want to push the received data to the store, set this option to `true`
 
 #### `normalizeOperation`
+
 You can define how your outgoing data should be serialized
 
-```
+````
 
 Exemplary data:
 ```js
@@ -247,7 +275,8 @@ Exemplary data:
   firstParam: 'My Name',
   colors: { rubyRed: 1, blueFish: 3 }
 }
-```
+````
+
 After using a `dasherize` transformer our request data will turn into:
 
 ```js
@@ -256,40 +285,49 @@ After using a `dasherize` transformer our request data will turn into:
   colors: { ruby-red: 1, blue-fish: 3 }
 }
 ```
+
 It's great for API with request data format restrictions
 
 **Available transformers:**
-  - camelize
-  - capitalize
-  - classify
-  - dasherize
-  - decamelize
-  - underscore
+
+- camelize
+- capitalize
+- classify
+- dasherize
+- decamelize
+- underscore
 
 #### `adapterOptions`
+
 Pass custom adapter options to handle them in `urlForCustomAction` in case of using `customAction`. Required usage of mixin: `AdpaterMixin`
 
 #### `responseType`
+
 You can easily observe the returned model by changing `responseType` to `array` or `object` according to what type of data
 your server will return.
 
 When `array`:
+
 ```js
-model.customAction({}, { responseType: 'array' }) // returns DS.PromiseArray
+model.customAction({}, { responseType: "array" }); // returns DS.PromiseArray
 ```
 
 When `object`:
+
 ```js
-model.customAction({}, { responseType: 'object' }) // returns DS.PromiseObject
+model.customAction({}, { responseType: "object" }); // returns DS.PromiseObject
 ```
 
 When `null` (default):
+
 ```js
-model.customAction({}, { responseType: null }) // returns Promise
+model.customAction({}, { responseType: null }); // returns Promise
 ```
+
 `null` is useful if you don't care about the response or just want to use `then` on the promise without using `binding` or display it in the template.
 
 #### `queryParams`
+
 You can pass a query params for a request by passing an `{}` with properties, eg: `{ include: 'owner' }`
 ** Remember: Query params are not normalized! You have to pass it in the correct format. **
 
@@ -297,30 +335,31 @@ You can pass a query params for a request by passing an `{}` with properties, eg
 
 ### Installation
 
-* `git clone https://github.com/Exelord/ember-custom-actions.git`
-* `cd ember-custom-actions`
-* `npm install`
+- `git clone https://github.com/Exelord/ember-custom-actions.git`
+- `cd ember-custom-actions`
+- `npm install`
 
 ### Linting
 
-* `npm run lint:hbs`
-* `npm run lint:js`
-* `npm run lint:js -- --fix`
+- `npm run lint:hbs`
+- `npm run lint:js`
+- `npm run lint:js -- --fix`
 
 ### Running tests
 
-* `ember test` – Runs the test suite on the current Ember version
-* `ember test --server` – Runs the test suite in "watch mode"
-* `ember try:each` – Runs the test suite against multiple Ember versions
+- `ember test` – Runs the test suite on the current Ember version
+- `ember test --server` – Runs the test suite in "watch mode"
+- `ember try:each` – Runs the test suite against multiple Ember versions
 
 ### Running the dummy application
 
-* `ember serve`
-* Visit the dummy application at [http://localhost:4200](http://localhost:4200).
+- `ember serve`
+- Visit the dummy application at [http://localhost:4200](http://localhost:4200).
 
 For more information on using ember-cli, visit [https://ember-cli.com/](https://ember-cli.com/).
 
 ## Thanks
+
 Big thanks to Mike North and his [Project](https://github.com/mike-north/ember-api-actions) for the initial concept.
 
 ## Contributing

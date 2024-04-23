@@ -1,3 +1,4 @@
+/* eslint-disable ember/no-mixins */
 import resourceAction from './actions/resource';
 import modelAction from './actions/model';
 import customAction from './actions/custom';
@@ -11,5 +12,5 @@ export {
   resourceAction,
   AdapterMixin,
   RESTSerializer,
-  JSONAPISerializer
+  JSONAPISerializer,
 };

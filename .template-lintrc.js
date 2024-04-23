@@ -4,6 +4,6 @@ module.exports = {
   extends: 'recommended',
   rules: {
     'block-indentation': false,
-    'attribute-indentation': false
-  }
+    'attribute-indentation': false,
+  },
 };

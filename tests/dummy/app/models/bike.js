@@ -1,8 +1,8 @@
-import Model from 'ember-data/model';
-import attr from 'ember-data/attr';
+import Model, { attr } from '@ember-data/model';
 import { modelAction } from 'ember-custom-actions';
 
-export default Model.extend({
-  name: attr(),
-  ride: modelAction('ride', { method: 'PUT', data: { defaultParam: 'ok' } })
-});
+export default class BikeModel extends Model {
+  @attr name;
+
+  ride = modelAction('ride', { method: 'PUT', data: { defaultParam: 'ok' } });
+}

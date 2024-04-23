@@ -1,44 +1,47 @@
+import Component from '@glimmer/component';
+import { tracked, cached } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
-import Component from '@ember/component';
-import { run } from '@ember/runloop';
-import { observer, computed } from '@ember/object';
+import { action } from '@ember/object';
+import { later } from '@ember/runloop';
 
-export default Component.extend({
-  tagName: 'tr',
-  classNames: 'action',
-  store: service(),
-  server: service(),
+export default class PageSectionsExamplesBurnActionComponent extends Component {
+  @service store;
+  @service server;
 
-  init() {
-    this._super(...arguments);
+  @tracked pending = false;
+  @tracked burned = false;
 
-    this.get('server').server.get('/bridges/burn', () => {
-      return [200, { }, 'true'];
+  constructor() {
+    super(...arguments);
+
+    this.server.server.get('/bridges/burn', () => {
+      return [200, {}, 'true'];
     });
-  },
+  }
 
-  bridge: computed('store', function() {
-    return this.get('store').createRecord('bridge');
-  }),
+  @cached
+  get bridge() {
+    return this.store.createRecord('bridge');
+  }
 
-  burnedObserver: observer('burned', function() {
-    if (this.get('burned') == true) {
-      run.later(() => {
-        this.set('burned', false);
+  @action
+  burnedObserver() {
+    if (this.burned == true) {
+      later(() => {
+        this.burned = false;
       }, 3000);
     }
-  }),
-
-  actions: {
-    burn() {
-      this.set('pending', true);
-
-      run.later(() => {
-        this.get('bridge').burnAll().then(() => {
-          this.set('burned', true);
-          this.set('pending', false);
-        });
-      }, 500);
-    }
   }
-});
+
+  @action
+  burn() {
+    this.pending = true;
+
+    later(() => {
+      this.bridge.burnAll().then(() => {
+        this.burned = true;
+        this.pending = false;
+      });
+    }, 500);
+  }
+}

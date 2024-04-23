@@ -1,55 +1,57 @@
+import Component from '@glimmer/component';
+import { tracked, cached } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
-import Component from '@ember/component';
-import { run } from '@ember/runloop';
-import { observer, computed } from '@ember/object';
+import { action } from '@ember/object';
+import { later } from '@ember/runloop';
 
-export default Component.extend({
-  tagName: 'tr',
-  classNames: 'action',
-  store: service(),
-  server: service(),
+export default class PageSectionsExamplesPostActionComponent extends Component {
+  @service store;
+  @service server;
 
-  init() {
-    this._super(...arguments);
+  @tracked pending = false;
 
-    this.get('server').server.post('/posts/:id/publish', (request) => {
-      let post = this.get('store').peekRecord('post', request.params.id);
-      let data = post.serialize({ includeId: true });
+  constructor() {
+    super(...arguments);
+
+    this.server.server.post('/posts/:id/publish', (request) => {
+      const post = this.store.peekRecord('post', request.params.id);
+      const data = post.serialize({ includeId: true });
       data.data.attributes.published = true;
 
-      return [200, { }, JSON.stringify(data)];
+      return [200, {}, JSON.stringify(data)];
     });
-  },
+  }
 
-  post: computed('store', function() {
-    return this.get('store').createRecord('post', { id: 1 });
-  }),
+  @cached
+  get post() {
+    return this.store.createRecord('post', { id: 1 });
+  }
 
-  publishedObserver: observer('post.published', function() {
-    if (this.get('post.published') == true) {
-      run.later(() => {
-        this.get('store').push({
+  @action
+  publishedObserver() {
+    if (this.post.published === true) {
+      later(() => {
+        this.store.push({
           data: {
             id: '1',
             type: 'post',
             attributes: {
-              published: false
-            }
-          }
+              published: false,
+            },
+          },
         });
       }, 3000);
     }
-  }),
-
-  actions: {
-    publish(post) {
-      this.set('pending', true);
-
-      run.later(() => {
-        post.publish().then(() => {
-          this.set('pending', false);
-        });
-      }, 500);
-    }
   }
-});
+
+  @action
+  publish(post) {
+    this.pending = true;
+
+    later(() => {
+      post.publish().then(() => {
+        this.pending = false;
+      });
+    }, 500);
+  }
+}

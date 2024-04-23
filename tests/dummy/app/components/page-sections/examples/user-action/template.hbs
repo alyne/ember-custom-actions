@@ -1,20 +1,29 @@
-<td>
-  <a role="button" class="btn btn-lg btn-outline btn-ember {{if user.name "disabled"}}" {{action "generate" user}}>Generate Profile</a>
-</td>
-<td>
-  {{#if pending}}
-    <p class="status text-warning">Pending</p>
-  {{else}}
-    <p class="status text-success">Waiting</p>
-  {{/if}}
-  <h4 class="request">users/1/generate</h4>
-</td>
-<td>
-  {{#if user.name}}
-    <div class={{if user.name "show-result"}}>
-      {{ember-initials name=user.name class="img-circle"}} <span class="h4">{{user.name}}</span>
-    </div>
-  {{else}}
-    <span class="text-muted call-to-action">Call custom action</span>
-  {{/if}}
-</td>
+<tr class="action">
+  <td>
+    {{! template-lint-disable link-href-attributes }}
+    <a
+      role="button"
+      class="btn btn-lg btn-outline btn-ember {{if this.user.name 'disabled'}}"
+      {{on "click" (fn this.generate this.user)}}
+      {{did-update this.nameObserver this.user.name}}
+    >Generate Profile</a>
+  </td>
+  <td>
+    {{#if this.pending}}
+      <p class="status text-warning">Pending</p>
+    {{else}}
+      <p class="status text-success">Waiting</p>
+    {{/if}}
+    <h4 class="request">users/1/generate</h4>
+  </td>
+  <td>
+    {{#if this.user.name}}
+      <div class={{if this.user.name "show-result"}}>
+        <EmberInitials @name={{this.user.name}} @class="img-circle" />
+        <span class="h4">{{this.user.name}}</span>
+      </div>
+    {{else}}
+      <span class="text-muted call-to-action">Call custom action</span>
+    {{/if}}
+  </td>
+</tr>

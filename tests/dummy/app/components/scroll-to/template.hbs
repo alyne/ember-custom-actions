@@ -1,5 +1,7 @@
-{{#if label}}
-  {{label}}
-{{else}}
-  {{yield}}
-{{/if}}
+<a role="button" href={{@href}} {{on "click" this.onClick}} ...attributes>
+  {{#if @label}}
+    {{@label}}
+  {{else}}
+    {{yield}}
+  {{/if}}
+</a>

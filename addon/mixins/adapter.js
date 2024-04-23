@@ -1,3 +1,4 @@
+/* eslint-disable ember/no-new-mixins */
 import Mixin from '@ember/object/mixin';
 import urlBuilder from 'ember-custom-actions/utils/url-builder';
 
@@ -61,5 +62,5 @@ export default Mixin.create({
 
     let url = urlBuilder(this._buildURL(), path, queryParams);
     return this.ajax(url, method, ajaxOptions);
-  }
+  },
 });
