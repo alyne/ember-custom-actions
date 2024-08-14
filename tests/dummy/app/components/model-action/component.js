@@ -1,15 +1,14 @@
+import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
-import Component from '@ember/component';
-import { computed } from '@ember/object';
 
-export default Component.extend({
-  store: service(),
+export default class ModelActionComponent extends Component {
+  @service store;
 
-  post: computed('property', function() {
-    return this.get('store').createRecord('post', { id: 1 });
-  }),
+  get post() {
+    return this.store.createRecord('post', { id: 1 });
+  }
 
-  status: computed('post', function() {
-    return this.get('post').publish();
-  })
-});
+  get status() {
+    return this.post.publish();
+  }
+}

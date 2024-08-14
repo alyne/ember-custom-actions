@@ -1,9 +1,8 @@
-import Model from 'ember-data/model';
-import attr from 'ember-data/attr';
+import Model, { attr } from '@ember-data/model';
 import { modelAction } from 'ember-custom-actions';
 
-export default Model.extend({
-  name: attr(),
+export default class UserModel extends Model {
+  @attr name;
 
-  profile: modelAction('profile', { responseType: 'object', method: 'get' })
-});
+  profile = modelAction('profile', { responseType: 'object', method: 'get' });
+}

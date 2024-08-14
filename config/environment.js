@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(environment, appConfig) {
+module.exports = function (environment, appConfig) {
   appConfig.emberCustomActions = {
     method: 'POST',
     data: {},
@@ -10,6 +10,6 @@ module.exports = function(environment, appConfig) {
     adapterOptions: {},
     pushToStore: false,
     responseType: null,
-    normalizeOperation: ''
+    normalizeOperation: '',
   };
 };

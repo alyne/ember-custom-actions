@@ -1,9 +1,11 @@
-import JSONAPIAdapter from 'ember-data/adapters/json-api';
+import JSONAPIAdapter from '@ember-data/adapter/json-api';
 import { AdapterMixin } from 'ember-custom-actions';
 
-export default JSONAPIAdapter.extend(AdapterMixin, {
+export default class CarAdapter extends JSONAPIAdapter.extend(AdapterMixin) {
   urlForCustomAction(modelName, id, snapshot, requestType) {
-    let { adapterOptions: { suffix } } = snapshot;
+    let {
+      adapterOptions: { suffix },
+    } = snapshot;
     suffix = suffix || '';
 
     if (requestType === 'clean') {
@@ -18,34 +20,34 @@ export default JSONAPIAdapter.extend(AdapterMixin, {
       return `/custom-cars/custom-fix-all${suffix}`;
     }
 
-    return this._super(...arguments);
-  },
+    return super.urlForCustomAction(...arguments);
+  }
 
   methodForCustomAction({ actionId }) {
     if (actionId === 'clean') {
       return 'PATCH';
     }
 
-    return this._super(...arguments);
-  },
+    return super.methodForCustomAction(...arguments);
+  }
 
   headersForCustomAction({ actionId }) {
     if (actionId === 'clean') {
       return {
-        myHeader: 'custom header'
+        myHeader: 'custom header',
       };
     }
 
-    return this._super(...arguments);
-  },
+    return super.headersForCustomAction(...arguments);
+  }
 
   dataForCustomAction({ actionId }) {
     if (actionId === 'clean') {
       return {
-        customParam: 'custom param'
+        customParam: 'custom param',
       };
     }
 
-    return this._super(...arguments);
+    return super.dataForCustomAction(...arguments);
   }
-});
+}

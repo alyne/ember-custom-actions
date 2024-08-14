@@ -1,9 +1,9 @@
 import Service from '@ember/service';
 import Pretender from 'pretender';
 
-export default Service.extend({
-  init() {
-    this._super(...arguments);
-    this.set('server', new Pretender());
+export default class ServerService extends Service {
+  constructor() {
+    super(...arguments);
+    this.server = new Pretender();
   }
-});
+}
